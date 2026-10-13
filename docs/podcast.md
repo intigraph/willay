@@ -110,3 +110,12 @@ Personal listening is the requested use. Free-plan shared output needs ElevenLab
 attribution; commercial rights depend on the paid-plan/service-specific terms,
 and beta services have separate restrictions. The show notes attribute generated
 voices. Do not assume a commercial or beta-output license from API availability.
+
+Provider generation has a bounded 300-second timeout. Transport failures report
+only the exception class and elapsed time; charges remain reserved and are not
+retried automatically. An operator can authorize a UTC-day-scoped budget via
+`WILLAY_CAP_OVERRIDE_DATE=YYYY-MM-DD`, `WILLAY_DAILY_CHARACTER_CAP`, and
+`WILLAY_DAILY_REQUEST_CAP` (maximum 60,000 and 60). Without a matching current
+UTC date, the normal 20,000/20 defaults apply. The effect-seconds cap is unchanged.
+This configuration requires the operator's explicit quota approval; never use it
+to evade a refusal, and never reset the ledger.

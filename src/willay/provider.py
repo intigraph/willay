@@ -7,6 +7,7 @@ import json
 import os
 import re
 import stat
+import time
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -57,18 +58,21 @@ def call(kind: str, payload: dict, secret: str) -> bytes:
         method="POST",
         headers={"xi-api-key": secret, "Content-Type": "application/json", "Accept": "audio/mpeg"},
     )
+    started = time.monotonic()
     try:
-        with urllib.request.build_opener(NoRedirect).open(req, timeout=90) as response:
+        with urllib.request.build_opener(NoRedirect).open(req, timeout=300) as response:
             if response.status != 200 or "audio" not in response.headers.get("Content-Type", ""):
                 raise Refused("Provider returned an unexpected response; charge remains reserved")
             audio = response.read(25 * 1024 * 1024 + 1)
     except urllib.error.HTTPError as exc:
         raise Refused(
-            f"Provider HTTP {exc.code}; charge remains reserved; no automatic retry"
+            f"Provider HTTP {exc.code} after {time.monotonic() - started:.1f}s; "
+            "charge remains reserved; no automatic retry"
         ) from None
-    except (OSError, TimeoutError, http.client.HTTPException):
+    except (OSError, TimeoutError, http.client.HTTPException) as exc:
         raise Refused(
-            "Provider result indeterminate; charge reserved; inspect before any retry"
+            f"Provider result indeterminate ({type(exc).__name__}, "
+            f"{time.monotonic() - started:.1f}s); charge reserved; inspect before any retry"
         ) from None
     if not audio or len(audio) > 25 * 1024 * 1024:
         raise Refused("Provider audio empty/oversized; charge remains reserved")

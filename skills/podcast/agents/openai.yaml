@@ -1,0 +1,4 @@
+interface:
+  display_name: "Podcast"
+  short_description: "Write and render sourced podcasts with Willay"
+  default_prompt: "Use $podcast to write a sourced TOML episode and render it with Willay."

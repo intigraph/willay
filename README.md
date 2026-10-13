@@ -1,72 +1,106 @@
-# willay
+<h1 align="center">willay</h1>
 
-*willay* (Quechua): to tell, to announce, news.
+<p align="center"><em>Agents write the episode. Willay performs it.</em></p>
 
-Agents write the episode; willay performs it. You give it a script with any
-number of hosts, sound effects and music cues, and it renders one finished
-podcast episode, using ElevenLabs voices.
+<p align="center">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT"/></a>
+  <a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3.12%2B-blue.svg" alt="Python 3.12+"/></a>
+  <a href="https://github.com/scbrown/willay/actions/workflows/check.yml"><img src="https://github.com/scbrown/willay/actions/workflows/check.yml/badge.svg" alt="CI"/></a>
+  <a href="docs/book/src/SUMMARY.md"><img src="https://img.shields.io/badge/docs-mdBook-green.svg" alt="Documentation"/></a>
+</p>
 
-willay does not call a language model. The agent that uses it already is one.
+*Willay* means “to tell / announce news” in Quechua. Give it an agent-written TOML
+script with a configurable panel of hosts, ElevenLabs voices, effects and music
+cues. It produces a finished MP3 with measured loudness, chapters and show notes,
+and can publish it to an already-private podcast feed.
 
-## Episode spec (draft, TOML)
+Willay does not call a language model. The agent writing the script already is one.
+
+## See it in action
+
+```sh
+uv sync --locked
+uv run --locked willay budget examples/episode.toml
+uv run --locked willay render examples/episode.toml -o out/example
+```
+
+Budgeting needs no key and makes no network request. Rendering reads the key at
+runtime from `ELEVENLABS_API_KEY_FILE` (or an already-held `ELEVENLABS_API_KEY`).
+The default owner-only file is `~/.config/willay/elevenlabs_api_key`; deployments
+may point at their existing vault-provisioned file. No key belongs in TOML or logs.
+
+## What it does
+
+- **Configurable hosts:** named voices and expressive turns, split at the API's
+  2,000-character/ten-voice request boundary.
+- **Effects and music:** local or generated sound effects, intro/outro files,
+  transition crossfades and a quiet music bed ducked beneath the foreground.
+- **Reusable takes:** content-addressed checked audio; changed model/text/voice
+  creates a new take, ambiguous generation refuses automatic paid retry.
+- **Finished episodes:** two-pass EBU R128 normalization, encoded MP3 measurements,
+  actual duration, chapters, show notes and completion hashes.
+- **Private subscriptions:** atomic RSS publishing, stable GUIDs and an authenticated
+  reader with byte ranges for podcast apps, behind reviewed HTTPS routing.
+- **Bounded usage:** shared host ledger, daily dialogue/effect/request ceilings,
+  one renderer and Prometheus-format usage metrics.
+
+## Episode spec
 
 ```toml
-title = "What the crew shipped this week"
+title = "A useful briefing"
 
-[[hosts]]                    # any number, 1..N
+[[hosts]]
 id = "ana"
-voice = "<elevenlabs-voice-id>"
-persona = "curious, asks the questions"
+voice = "JBFqnCBsd6RMkjVDRZzb"
 
 [[hosts]]
 id = "rafa"
-voice = "<elevenlabs-voice-id>"
-persona = "dry, knows the details"
-
-[music]
-intro = "assets/intro.mp3"
-outro = "assets/outro.mp3"
-bed = { file = "assets/bed.mp3", gain_db = -24 }   # optional under-speech bed
+voice = "Aw4FAjKCGjjNkVhN1Xmq"
 
 [[segments]]
-say = { host = "ana", text = "[excited] Welcome back!" }
+chapter = "Welcome"
+say = { host = "ana", text = "[curious] What changed?" }
 
 [[segments]]
-say = { host = "rafa", text = "Three releases and one very stubborn alert." }
-
-[[segments]]
-sfx = { file = "assets/whoosh.wav" }   # or { prompt = "soft whoosh" } via ElevenLabs sound effects
-
-[[segments]]
-transition = { file = "assets/sting.mp3", crossfade_ms = 400 }
-
-[[segments]]
-say = { host = "ana", text = "Let's start with the alert." }
+say = { host = "rafa", text = "Let's start with what was measured." }
 ```
 
-## Pipeline
+Add `[music]` for intro/outro and a bed. Use `sfx` for a local file or generated
+prompt, and `transition` for a local sting with crossfade. The whole spec and all
+assets validate before any paid call. See [the format and commands](docs/podcast.md).
 
-1. Validate the spec (hosts referenced exist, assets exist, character budget).
-2. Group consecutive `say` turns into dialogue chunks within the API limit and
-   render each with ElevenLabs Text to Dialogue (multi-speaker, expressive tags).
-3. Render `sfx` from files or ElevenLabs sound-effect prompts; cache every render
-   by content hash so re-runs only pay for what changed.
-4. Assemble with ffmpeg: intro, segments, transitions with crossfades, music bed
-   ducked under speech, outro; EBU R128 loudness normalisation.
-5. Write `episode.mp3`, chapters and show notes, and optionally publish to a
-   private RSS feed.
+## CLI
 
-## Interfaces
+```text
+willay budget episode.toml
+willay voices
+willay render episode.toml -o out/episode
+willay render episode.toml -o out/episode --feed-root /approved/feed --base-url https://podcasts.example.test
+willay publish out/episode --feed-root /approved/feed --base-url https://podcasts.example.test
+willay metrics
+```
 
-- CLI: `willay render episode.toml -o out/`, `willay voices`, `willay budget episode.toml`
-- Agent skill: how to write a good multi-host script for willay.
-- MCP tool: later.
+The feed reader is a separate reviewed service-host deployment; publishing files
+alone does not create DNS, TLS or authentication. The [podcast skill](skills/podcast/SKILL.md)
+helps agents write sourced episodes and verify actual listening results.
 
-## Safety
+## Development and releases
 
-- The ElevenLabs key comes from the environment, never from the spec or the repo.
-- A per-day character cap and a dry-run budget check before any paid call.
+```sh
+just setup
+just check
+just build
+just docs
+```
 
-## Status
+Python/uv keep the existing credential client and tested subprocess pipeline
+reusable. Release-please is the Python release-PR equivalent of release-plz;
+release artifacts are built from the exact tag in the same workflow that creates
+the release, with checksums. mdBook/Pages, quality entry points and licensing
+follow the related stack repository conventions. See [the design decision](docs/design.md).
 
-Design only. See the issues for the build plan.
+Source checks use synthetic tones and mocked provider calls, with real ffmpeg
+assembly and actual authentication/range-handler controls. They do not certify
+live provider speech, an installed feed or playback in a listener's app.
+Personal listening is the intended use; generated voices are attributed to
+ElevenLabs and output rights follow the account/service terms.

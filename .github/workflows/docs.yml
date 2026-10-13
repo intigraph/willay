@@ -1,0 +1,63 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Publishes the mdBook to the `gh-pages` branch (contents:write), which GitHub
+# Pages then serves. This avoids the official Pages deploy path, which needs a
+# `pages: write` token this repo's integration doesn't grant. One-time setup:
+# Settings → Pages → "Deploy from a branch" → gh-pages / (root).
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-pages
+  cancel-in-progress: false
+
+jobs:
+  relevant-changes:
+    name: Relevant changes
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.paths.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: paths
+        uses: ./.github/actions/path-gate
+        with:
+          base: ${{ github.event.pull_request.base.sha || github.event.before || github.sha }}
+          head: ${{ github.event.pull_request.head.sha || github.sha }}
+          paths: |
+            docs/book/**
+            .github/workflows/docs.yml
+            .github/actions/path-gate/**
+
+  build-deploy:
+    name: Build relevant docs
+    needs: relevant-changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install mdbook
+        if: needs.relevant-changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        run: cargo install mdbook --version "^0.4" --locked
+      - name: Build book
+        if: needs.relevant-changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        run: mdbook build docs/book
+      - name: Deploy to gh-pages
+        if: >-
+          (github.event_name == 'push' && needs.relevant-changes.outputs.changed == 'true') ||
+          github.event_name == 'workflow_dispatch'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/book/book
+          publish_branch: gh-pages

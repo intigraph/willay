@@ -1,0 +1,31 @@
+name: Repository checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  design-spec:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check documented TOML syntax
+        run: |
+          python - <<'PY'
+          import pathlib
+          import re
+          import tomllib
+          readme = pathlib.Path('README.md').read_text()
+          assert readme.strip(), 'README must not be empty'
+          examples = re.findall(r'```toml\s*\n(.*?)```', readme, re.S)
+          assert examples, 'README must contain a TOML episode example'
+          for example in examples:
+              spec = tomllib.loads(example)
+              assert spec.get('title') and spec.get('hosts') and spec.get('segments')
+          print(f'Checked {len(examples)} documented TOML example(s)')
+          PY

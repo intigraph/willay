@@ -18,6 +18,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      actions: write
     outputs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
@@ -27,6 +28,19 @@ jobs:
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+      - name: Run required CI on the release PR branch
+        if: steps.release.outputs.prs_created == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_PRS: ${{ steps.release.outputs.prs }}
+        run: |
+          set -euo pipefail
+          test "$(jq 'length' <<< "$RELEASE_PRS")" -gt 0
+          while IFS= read -r branch; do
+            gh workflow run check.yml --ref "$branch"
+            gh workflow run bootstrap.yml --ref "$branch"
+          done < <(jq -er '.[].headBranchName' <<< "$RELEASE_PRS")
   artifacts:
     needs: release-please
     if: >-

@@ -1,0 +1,17 @@
+Script started on 2026-10-13 00:23:35-04:00 [COMMAND="bash docs/demos/run.sh" <not executed on terminal>]
+Base: 7471d8f49671a7af48893b4bc7722883f893657a (design only)
+Observed: no executable package on base
+Candidate CLI; no provider calls:
+uv run --locked willay --version
+willay 0.1.0
+uv run --locked willay budget examples/episode.toml
+{
+  "dialogue_characters": 105,
+  "generated_effect_seconds": 0,
+  "paid_requests": 1,
+  "pieces": 1
+}
+Negative control: unknown host refuses before provider I/O
+REFUSED: Unknown host
+
+Script done on 2026-10-13 00:23:35-04:00 [COMMAND_EXIT_CODE="0"]

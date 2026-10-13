@@ -1,0 +1,9 @@
+[book]
+title = "Willay"
+authors = ["Steve Brown"]
+language = "en"
+src = "src"
+
+[output.html]
+git-repository-url = "https://github.com/scbrown/willay"
+edit-url-template = "https://github.com/scbrown/willay/edit/main/docs/book/{path}"

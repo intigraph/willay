@@ -1,0 +1,19 @@
+title = "A small example"
+description = "Agent-written dialogue; AI voices by ElevenLabs. Personal listening."
+
+[[hosts]]
+id = "ana"
+voice = "JBFqnCBsd6RMkjVDRZzb"
+persona = "curious; asks concrete questions"
+
+[[hosts]]
+id = "rafa"
+voice = "Aw4FAjKCGjjNkVhN1Xmq"
+persona = "explains evidence without overstating it"
+
+[[segments]]
+chapter = "Welcome"
+say = { host = "ana", text = "[curious] What makes a useful result?" }
+
+[[segments]]
+say = { host = "rafa", text = "A clear claim, a repeatable probe, and the limits of what it proves." }

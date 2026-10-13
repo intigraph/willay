@@ -17,9 +17,16 @@ host identifiers. A private feed does not authorize publishing it publicly.
 
 For a five-to-ten-minute episode, aim for roughly 700–1,400 spoken words, then
 use the rendered duration rather than claiming a word-count estimate is timing.
-Give hosts distinct roles, let questions move the story, and explain technical
-terms once. Keep each turn below 2,000 characters. Use expressive bracket tags
-sparingly. Do not invent quotes, conversations or speaker identity claims.
+Default to casual conversation: short reactive turns, contractions and plain
+words. Each line answers, challenges or picks up the previous thought. Use
+follow-up questions, light disagreement and callbacks; avoid lecture paragraphs
+and repeated introductions. Most stretches are two people talking; a third
+joins for a reason. Never schedule a repeating A → B → C speaker rotation.
+Give hosts distinct roles and explain technical terms once. Keep each turn below 2,000 characters. Use expressive bracket tags
+sparingly ([laughs], [chuckles], [sighs]); reactions should feel motivated.
+Keep stories conversational too, with brief listener reactions rather than a
+long formal monologue. Read the dialogue aloud before rendering and check that
+each handoff flows naturally. Do not invent quotes, conversations or speaker identity claims.
 `[[hosts]]` configures any needed panel; calls split at ten unique voices.
 
 Use `chapter` on a segment to mark topic boundaries. Intro/outro, transition

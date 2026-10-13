@@ -8,27 +8,40 @@ podcast episode, using ElevenLabs voices.
 
 willay does not call a language model. The agent that uses it already is one.
 
-## Episode spec (draft)
+## Episode spec (draft, TOML)
 
-```yaml
-title: What the crew shipped this week
-hosts:                       # any number, 1..N
-  - id: ana
-    voice: <elevenlabs-voice-id>
-    persona: curious, asks the questions
-  - id: rafa
-    voice: <elevenlabs-voice-id>
-    persona: dry, knows the details
-music:
-  intro: assets/intro.mp3
-  outro: assets/outro.mp3
-  bed: { file: assets/bed.mp3, gain_db: -24 }   # optional under-speech bed
-segments:
-  - say: { host: ana, text: "[excited] Welcome back!" }
-  - say: { host: rafa, text: "Three releases and one very stubborn alert." }
-  - sfx: { file: assets/whoosh.wav }            # or { prompt: "soft whoosh" } via ElevenLabs sound effects
-  - transition: { file: assets/sting.mp3, crossfade_ms: 400 }
-  - say: { host: ana, text: "Let's start with the alert." }
+```toml
+title = "What the crew shipped this week"
+
+[[hosts]]                    # any number, 1..N
+id = "ana"
+voice = "<elevenlabs-voice-id>"
+persona = "curious, asks the questions"
+
+[[hosts]]
+id = "rafa"
+voice = "<elevenlabs-voice-id>"
+persona = "dry, knows the details"
+
+[music]
+intro = "assets/intro.mp3"
+outro = "assets/outro.mp3"
+bed = { file = "assets/bed.mp3", gain_db = -24 }   # optional under-speech bed
+
+[[segments]]
+say = { host = "ana", text = "[excited] Welcome back!" }
+
+[[segments]]
+say = { host = "rafa", text = "Three releases and one very stubborn alert." }
+
+[[segments]]
+sfx = { file = "assets/whoosh.wav" }   # or { prompt = "soft whoosh" } via ElevenLabs sound effects
+
+[[segments]]
+transition = { file = "assets/sting.mp3", crossfade_ms = 400 }
+
+[[segments]]
+say = { host = "ana", text = "Let's start with the alert." }
 ```
 
 ## Pipeline
@@ -45,7 +58,7 @@ segments:
 
 ## Interfaces
 
-- CLI: `willay render episode.yaml -o out/`, `willay voices`, `willay budget episode.yaml`
+- CLI: `willay render episode.toml -o out/`, `willay voices`, `willay budget episode.toml`
 - Agent skill: how to write a good multi-host script for willay.
 - MCP tool: later.
 

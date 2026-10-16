@@ -3,7 +3,7 @@
 <p align="center"><em>Agents write the episode. Willay performs it.</em></p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="Apache-2.0"/></a>
   <a href="https://www.python.org"><img src="https://img.shields.io/badge/Python-3.12%2B-blue.svg" alt="Python 3.12+"/></a>
   <a href="https://github.com/scbrown/willay/actions/workflows/check.yml"><img src="https://github.com/scbrown/willay/actions/workflows/check.yml/badge.svg" alt="CI"/></a>
   <a href="docs/book/src/SUMMARY.md"><img src="https://img.shields.io/badge/docs-mdBook-green.svg" alt="Documentation"/></a>

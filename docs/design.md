@@ -8,7 +8,7 @@ dependency supplies a packaged ffmpeg when the host has none. Python/uv are
 required; this is not a static native binary.
 
 The repository follows the Yupana template for justfile quality/build/docs
-entry points, MIT licensing, mdBook/Pages and same-workflow release artifacts
+entry points, Apache-2.0 licensing, mdBook/Pages and same-workflow release artifacts
 with checksums. Python uses release-please as the language-appropriate
 release-PR equivalent; release-plz supports Rust packages. The release PR
 updates pyproject.toml, changelog and the marked root package version in uv.lock.

@@ -2,7 +2,8 @@
 name = "willay"
 version = "0.1.0"
 description = "Agent-written TOML dialogue, voices, sound effects and private podcasts"
-license = "MIT"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 readme = "README.md"
 authors = [
     { name = "Steve Brown", email = "scbrown3@gmail.com" }

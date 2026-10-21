@@ -5,5 +5,5 @@ language = "en"
 src = "src"
 
 [output.html]
-git-repository-url = "https://github.com/scbrown/willay"
-edit-url-template = "https://github.com/scbrown/willay/edit/main/docs/book/{path}"
+git-repository-url = "https://github.com/intigraph/willay"
+edit-url-template = "https://github.com/intigraph/willay/edit/main/docs/book/{path}"

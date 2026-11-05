@@ -16,6 +16,28 @@ and can publish it to an already-private podcast feed.
 
 Willay does not call a language model. The agent writing the script already is one.
 
+## Install
+
+With Python 3.12+ and [uv](https://docs.astral.sh/uv/) already installed:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/intigraph/willay/main/install.sh | sh
+```
+
+The installer selects the latest stable release, verifies its wheel against the
+release's SHA256SUMS, and installs it with uv into a new private version directory
+under `~/.local/share/willay`. Add the printed `bin` directory to PATH. It refuses
+an existing destination; `VERSION=0.1.0` pins a release, `PREFIX` or `--prefix`
+chooses a new destination, and `--dry-run` checks metadata without installing or
+verifying payload bytes. To pass options through a pipe use `sh -s -- --dry-run`;
+set VERSION/PREFIX on the `sh` process, not on curl.
+
+The release checksum trusts the publisher and HTTPS; it is not an independent
+signature. Runtime dependencies are resolved from PyPI by uv and are not covered
+by the release wheel checksum. No Python runtime is downloaded. No API key,
+rendering, feed, service or shell profile is configured. To remove this install,
+remove only its printed version directory and its PATH entry.
+
 ## See it in action
 
 ```sh

@@ -1,0 +1,62 @@
+name: Release wheel installer
+
+on:
+  pull_request:
+    paths: [install.sh, tests/test_installer.py, .github/workflows/install.yml]
+  push:
+    branches: [main]
+    paths: [install.sh, tests/test_installer.py, .github/workflows/install.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, macos-15-intel]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
+        with:
+          version: '0.12.0'
+          enable-cache: false
+      - name: Actual installer controls
+        run: python3 tests/test_installer.py
+      - name: Published release private install and retained-destination refusal
+        shell: bash
+        run: |
+          set -euo pipefail
+          export PREFIX="$RUNNER_TEMP/willay-release"
+          export VERSION=0.1.0
+          sh install.sh --dry-run
+          test ! -e "$PREFIX"
+          sh install.sh
+          test "$("$PREFIX/bin/willay" --version)" = 'willay 0.1.0'
+          if sh install.sh; then
+            echo 'existing install was overwritten' >&2
+            exit 1
+          fi
+          test "$("$PREFIX/bin/willay" --version)" = 'willay 0.1.0'
+      - name: Default command discovery without shell-profile changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          export HOME="$RUNNER_TEMP/willay-default-home"
+          mkdir -p "$HOME"
+          unset PREFIX
+          export VERSION=0.1.0
+          sh install.sh --dry-run
+          test ! -e "$HOME/.local"
+          sh install.sh
+          test -L "$HOME/.local/bin/willay"
+          test "$("$HOME/.local/bin/willay" --version)" = 'willay 0.1.0'
+          test ! -e "$HOME/.profile"

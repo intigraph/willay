@@ -1,2 +1,3 @@
 # Preserve raw terminal bytes and replay timing; do not normalize the capture.
 docs/demos/output.log -text -diff
+docs/demos/installer/output.log -text whitespace=-blank-at-eol

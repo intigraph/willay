@@ -54,7 +54,7 @@ class InstallerTests(unittest.TestCase):
         ):
             INSTALLER["install"](["--prefix", str(self.prefix), *args])
 
-    def invoke_default(self, *args):
+    def invoke_default(self, *args, home=None):
         def install_child(command, **kwargs):
             if command[1:3] == ["tool", "install"]:
                 binary = Path(kwargs["env"]["UV_TOOL_BIN_DIR"]) / "willay"
@@ -66,16 +66,25 @@ class InstallerTests(unittest.TestCase):
             patch.dict(INSTALLER, download=self.download),
             patch("shutil.which", return_value="/fixture/uv"),
             patch("subprocess.run", side_effect=install_child),
-            patch.dict(os.environ, {"VERSION": "0.1.0", "PREFIX": "", "HOME": self.temporary.name}),
+            patch.dict(
+                os.environ,
+                {"VERSION": "0.1.0", "PREFIX": "", "HOME": str(home or self.temporary.name)},
+            ),
         ):
             INSTALLER["install"](list(args))
 
     def test_default_install_exposes_command_without_profile_changes(self):
-        self.invoke_default()
-        home = Path(self.temporary.name)
+        root = Path(self.temporary.name)
+        real_home = root / "physical-home"
+        real_home.mkdir()
+        home = root / "aliased-home"
+        home.symlink_to(real_home, target_is_directory=True)
+        self.invoke_default(home=home)
         binary = home / ".local/bin/willay"
         self.assertTrue(binary.is_symlink())
-        self.assertEqual(binary.resolve(), home / ".local/share/willay/v0.1.0/bin/willay")
+        self.assertEqual(
+            binary.resolve(), (home / ".local/share/willay/v0.1.0/bin/willay").resolve()
+        )
         self.assertEqual(binary.read_text(), "fixture command")
         self.assertFalse((home / ".profile").exists())
 

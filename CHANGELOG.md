@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/intigraph/willay/compare/v0.1.0...v0.2.0) (2026-11-06)
+
+
+### Features
+
+* **install:** add verified release wheel installer ([#8](https://github.com/intigraph/willay/issues/8)) ([ac529aa](https://github.com/intigraph/willay/commit/ac529aa7a57712ef1e63ab73fee51549738d3a3b))
+
 ## 0.1.0 (2026-10-13)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/intigraph/willay/compare/v0.2.0...v0.2.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* **ci:** run PR checks once and cancel superseded revisions ([#10](https://github.com/intigraph/willay/issues/10)) ([ba6f708](https://github.com/intigraph/willay/commit/ba6f7086c43b8e672719920fe480218c0484d350))
+
 ## [0.2.0](https://github.com/intigraph/willay/compare/v0.1.0...v0.2.0) (2026-11-06)
 
 
